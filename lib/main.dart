@@ -239,7 +239,7 @@ class _HomeState extends State<Home> {
                 left: 4,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.black54,
+                  color: Colors.black.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: IconButton(
@@ -484,8 +484,8 @@ class _FullScreenViewerWithNavigationState
               left: 10,
               top: MediaQuery.of(context).size.height / 2 - 20,
               child: IconButton(
-                icon: const Icon(Icons.chevron_left,
-                    color: Colors.white, size: 40),
+                icon: Icon(Icons.chevron_left,
+                    color: Colors.white.withValues(alpha: 0.2), size: 40),
                 onPressed: () {
                   if (_currentIndex > 0) {
                     _pageController.previousPage(
@@ -499,8 +499,8 @@ class _FullScreenViewerWithNavigationState
               right: 10,
               top: MediaQuery.of(context).size.height / 2 - 20,
               child: IconButton(
-                icon: const Icon(Icons.chevron_right,
-                    color: Colors.white, size: 40),
+                icon: Icon(Icons.chevron_right,
+                    color: Colors.white.withValues(alpha: 0.2), size: 40),
                 onPressed: () {
                   if (_currentIndex < total - 1) {
                     _pageController.nextPage(
