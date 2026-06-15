@@ -13,6 +13,7 @@ void main() {
 
 String serverHost = "raspberry.local";
 String serverPort = "5000";
+double uiOpacity = 0.5;
 String get server => "http://$serverHost:$serverPort";
 
 class App extends StatelessWidget {
@@ -305,48 +306,69 @@ class _HomeState extends State<Home> {
   void _showSettingsDialog() {
     final hostController = TextEditingController(text: serverHost);
     final portController = TextEditingController(text: serverPort);
+    double tempOpacity = uiOpacity;
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text("Configuración del servidor"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: hostController,
-              decoration: const InputDecoration(
-                labelText: "Hostname / IP",
-                hintText: "ej. raspberry.local",
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text("Configuración"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: hostController,
+                decoration: const InputDecoration(
+                  labelText: "Hostname / IP",
+                  hintText: "ej. raspberry.local",
+                ),
               ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: portController,
+                decoration: const InputDecoration(
+                  labelText: "Puerto",
+                  hintText: "ej. 5000",
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  const Text("Opacidad símbolos:"),
+                  Expanded(
+                    child: Slider(
+                      value: tempOpacity,
+                      min: 0.1,
+                      max: 1.0,
+                      divisions: 9,
+                      label: "${(tempOpacity * 100).round()}%",
+                      onChanged: (v) => setDialogState(() => tempOpacity = v),
+                    ),
+                  ),
+                  Text("${(tempOpacity * 100).round()}%"),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text("Cancelar"),
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: portController,
-              decoration: const InputDecoration(
-                labelText: "Puerto",
-                hintText: "ej. 5000",
-              ),
-              keyboardType: TextInputType.number,
+            FilledButton(
+              onPressed: () {
+                setState(() {
+                  serverHost = hostController.text.trim();
+                  serverPort = portController.text.trim();
+                  uiOpacity = tempOpacity;
+                });
+                _loadCloudAssets();
+                Navigator.pop(ctx);
+              },
+              child: const Text("Guardar"),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text("Cancelar"),
-          ),
-          FilledButton(
-            onPressed: () {
-              setState(() {
-                serverHost = hostController.text.trim();
-                serverPort = portController.text.trim();
-              });
-              _loadCloudAssets();
-              Navigator.pop(ctx);
-            },
-            child: const Text("Guardar"),
-          ),
-        ],
       ),
     );
   }
@@ -485,7 +507,7 @@ class _FullScreenViewerWithNavigationState
               top: MediaQuery.of(context).size.height / 2 - 20,
               child: IconButton(
                 icon: Icon(Icons.chevron_left,
-                    color: Colors.white.withValues(alpha: 0.2), size: 40),
+                    color: Colors.white.withValues(alpha: uiOpacity), size: 40),
                 onPressed: () {
                   if (_currentIndex > 0) {
                     _pageController.previousPage(
@@ -500,7 +522,7 @@ class _FullScreenViewerWithNavigationState
               top: MediaQuery.of(context).size.height / 2 - 20,
               child: IconButton(
                 icon: Icon(Icons.chevron_right,
-                    color: Colors.white.withValues(alpha: 0.2), size: 40),
+                    color: Colors.white.withValues(alpha: uiOpacity), size: 40),
                 onPressed: () {
                   if (_currentIndex < total - 1) {
                     _pageController.nextPage(
@@ -517,15 +539,18 @@ class _FullScreenViewerWithNavigationState
             child: Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.share, color: Colors.white),
+                  icon: Icon(Icons.share,
+                      color: Colors.white.withValues(alpha: uiOpacity)),
                   onPressed: _onShare,
                 ),
                 IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.white),
+                  icon: Icon(Icons.delete,
+                      color: Colors.white.withValues(alpha: uiOpacity)),
                   onPressed: _onDelete,
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white),
+                  icon: Icon(Icons.close,
+                      color: Colors.white.withValues(alpha: uiOpacity)),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
@@ -540,7 +565,7 @@ class _FullScreenViewerWithNavigationState
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.black54,
+                  color: Colors.black.withValues(alpha: uiOpacity),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
