@@ -11,7 +11,9 @@ void main() {
   runApp(const App());
 }
 
-String server = "http://raspberry.local:5000";
+String serverHost = "raspberry.local";
+String serverPort = "5000";
+String get server => "http://$serverHost:$serverPort";
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -300,6 +302,55 @@ class _HomeState extends State<Home> {
     );
   }
 
+  void _showSettingsDialog() {
+    final hostController = TextEditingController(text: serverHost);
+    final portController = TextEditingController(text: serverPort);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Configuración del servidor"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: hostController,
+              decoration: const InputDecoration(
+                labelText: "Hostname / IP",
+                hintText: "ej. raspberry.local",
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: portController,
+              decoration: const InputDecoration(
+                labelText: "Puerto",
+                hintText: "ej. 5000",
+              ),
+              keyboardType: TextInputType.number,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("Cancelar"),
+          ),
+          FilledButton(
+            onPressed: () {
+              setState(() {
+                serverHost = hostController.text.trim();
+                serverPort = portController.text.trim();
+              });
+              _loadCloudAssets();
+              Navigator.pop(ctx);
+            },
+            child: const Text("Guardar"),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -307,6 +358,12 @@ class _HomeState extends State<Home> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Galería PRO"),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: _showSettingsDialog,
+            ),
+          ],
           bottom: const TabBar(
             tabs: [
               Tab(text: "LOCAL", icon: Icon(Icons.photo_library)),
