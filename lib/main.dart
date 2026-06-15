@@ -379,7 +379,7 @@ class _HomeState extends State<Home> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Galería PRO"),
+          title: const Text("Galería PRO", style: TextStyle(fontSize: 11)),
           actions: [
             IconButton(
               icon: const Icon(Icons.settings),
@@ -436,6 +436,7 @@ class _FullScreenViewerWithNavigationState
     extends State<FullScreenViewerWithNavigation> {
   late PageController _pageController;
   int _currentIndex = 0;
+  bool _isZoomed = false;
 
   @override
   void initState() {
@@ -487,17 +488,29 @@ class _FullScreenViewerWithNavigationState
         children: [
           PageView.builder(
             controller: _pageController,
+            physics: _isZoomed ? const NeverScrollableScrollPhysics() : null,
             itemCount: total,
             onPageChanged: (index) {
               setState(() {
+                _isZoomed = false;
                 _currentIndex = index;
               });
             },
             itemBuilder: (context, index) {
               if (widget.isLocal) {
-                return _LocalMediaViewer(asset: widget.localAssets[index]);
+                return _LocalMediaViewer(
+                  asset: widget.localAssets[index],
+                  onZoomChanged: (zoomed) {
+                    if (zoomed != _isZoomed) setState(() => _isZoomed = zoomed);
+                  },
+                );
               } else {
-                return _CloudMediaViewer(item: widget.cloudAssets[index]);
+                return _CloudMediaViewer(
+                  item: widget.cloudAssets[index],
+                  onZoomChanged: (zoomed) {
+                    if (zoomed != _isZoomed) setState(() => _isZoomed = zoomed);
+                  },
+                );
               }
             },
           ),
@@ -570,7 +583,7 @@ class _FullScreenViewerWithNavigationState
                 ),
                 child: Text(
                   "${_currentIndex + 1} / $total",
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.white.withValues(alpha: uiOpacity)),
                 ),
               ),
             ),
@@ -583,7 +596,8 @@ class _FullScreenViewerWithNavigationState
 
 class _LocalMediaViewer extends StatefulWidget {
   final AssetEntity asset;
-  const _LocalMediaViewer({required this.asset});
+  final ValueChanged<bool> onZoomChanged;
+  const _LocalMediaViewer({required this.asset, required this.onZoomChanged});
 
   @override
   State<_LocalMediaViewer> createState() => _LocalMediaViewerState();
@@ -634,6 +648,9 @@ class _LocalMediaViewerState extends State<_LocalMediaViewer> {
             return PhotoView(
               imageProvider: FileImage(snapshot.data!),
               backgroundDecoration: const BoxDecoration(color: Colors.black),
+              scaleStateChangedCallback: (state) {
+                widget.onZoomChanged(state == PhotoViewScaleState.zoomedIn);
+              },
             );
           }
           if (snapshot.hasError)
@@ -647,7 +664,8 @@ class _LocalMediaViewerState extends State<_LocalMediaViewer> {
 
 class _CloudMediaViewer extends StatefulWidget {
   final Map<String, dynamic> item;
-  const _CloudMediaViewer({required this.item});
+  final ValueChanged<bool> onZoomChanged;
+  const _CloudMediaViewer({required this.item, required this.onZoomChanged});
 
   @override
   State<_CloudMediaViewer> createState() => _CloudMediaViewerState();
@@ -695,6 +713,9 @@ class _CloudMediaViewerState extends State<_CloudMediaViewer> {
       return PhotoView(
         imageProvider: NetworkImage(url),
         backgroundDecoration: const BoxDecoration(color: Colors.black),
+        scaleStateChangedCallback: (state) {
+          widget.onZoomChanged(state == PhotoViewScaleState.zoomedIn);
+        },
       );
     }
   }
