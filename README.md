@@ -1,17 +1,38 @@
 # galery_app
 
-A new Flutter project.
+App de galería multiplataforma desarrollada con Flutter. Permite visualizar fotos y videos locales, subirlos a un servidor en la nube y gestionar contenido multimedia desde el dispositivo.
 
-## Getting Started
+## Características
 
-This project is a starting point for a Flutter application.
+- Visualización de fotos y videos locales usando `photo_manager`
+- Carga de archivos a servidor remoto (Raspberry Pi)
+- Visor a pantalla completa con navegación entre archivos
+- Soporte para video local y en streaming
+- Gestión de contenido en nube (subir, eliminar, compartir)
+- Compartir archivos mediante `share_plus`
 
-A few resources to get you started if this is your first Flutter project:
+## Stack técnico
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+- **Framework:** Flutter (Dart)
+- **Dependencias principales:** `photo_manager`, `video_player`, `http`, `share_plus`, `photo_view`, `path_provider`, `permission_handler`
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Requisitos
+
+- Flutter SDK >=3.0.0
+- Dispositivo Android/iOS con API 21+
+- Servidor backend corriendo en `http://raspberry.local:5000`
+
+## Instalación
+
+```bash
+git clone <repo-url>
+cd galery_app
+flutter pub get
+flutter run
+```
+
+## Uso
+
+- **LOCAL:** Explora fotos y videos del dispositivo. Pulsación larga para subir a la nube.
+- **NUBE:** Visualiza archivos remotos. Pulsación larga para eliminar.
+- Toca cualquier archivo para abrir el visor a pantalla completa con navegación.
